@@ -1,13 +1,8 @@
 package com.aliware.tianchi;
 
+import com.aliware.tianchi.checker.ServerThreadChecker;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 import org.apache.dubbo.rpc.service.CallbackService;
-
-import java.util.Date;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author daofeng.xjf
@@ -18,34 +13,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CallbackServiceImpl implements CallbackService {
 
-    public CallbackServiceImpl() {
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (!listeners.isEmpty()) {
-                    for (Map.Entry<String, CallbackListener> entry : listeners.entrySet()) {
-                        try {
-                            entry.getValue().receiveServerMsg(System.getProperty("quota") + " " + new Date().toString());
-                        } catch (Throwable t1) {
-                            listeners.remove(entry.getKey());
-                        }
-                    }
-                }
-            }
-        }, 0, 5000);
-    }
-
-    private Timer timer = new Timer();
-
-    /**
-     * key: listener type
-     * value: callback listener
-     */
-    private final Map<String, CallbackListener> listeners = new ConcurrentHashMap<>();
+    private CallbackListener listener;
 
     @Override
     public void addListener(String key, CallbackListener listener) {
-        listeners.put(key, listener);
-        listener.receiveServerMsg(new Date().toString()); // send notification for change
+        this.listener = listener;
+        ServerThreadChecker serverThreadChecker = ServerThreadChecker.Singleton.INSTANCE;
+        serverThreadChecker.initServerInfo(this);
+        sendMsg(serverThreadChecker.getServerInfo().toString());
+    }
+
+    public void sendMsg(String msg) {
+        listener.receiveServerMsg(msg);
     }
 }

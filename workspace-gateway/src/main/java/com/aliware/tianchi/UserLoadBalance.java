@@ -1,5 +1,6 @@
 package com.aliware.tianchi;
 
+import com.aliware.tianchi.checker.ServerInfoHolder;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
@@ -19,8 +20,27 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class UserLoadBalance implements LoadBalance {
 
+    private final BoolLock init = new BoolLock();
+
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
-        return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
+        if (!init.tryLock()) {
+            invokers.forEach(
+                    invoker -> ServerInfoHolder.get(invoker.getUrl().getPort())
+            );
+        }
+        ServerInfo serverInfo = ServerInfoHolder.loadPowerest();
+        if (serverInfo != null) {
+            int port = serverInfo.getServerPort();
+            for (Invoker<T> invoker : invokers) {
+                if (invoker.getUrl().getPort() == port) {
+                    return invoker;
+                }
+            }
+        }
+        {
+            Invoker invoker = invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
+            return invoker;
+        }
     }
 }

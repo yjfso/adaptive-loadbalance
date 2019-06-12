@@ -2,11 +2,8 @@ package com.aliware.tianchi;
 
 import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.Activate;
-import org.apache.dubbo.rpc.Filter;
-import org.apache.dubbo.rpc.Invocation;
-import org.apache.dubbo.rpc.Invoker;
-import org.apache.dubbo.rpc.Result;
-import org.apache.dubbo.rpc.RpcException;
+import org.apache.dubbo.rpc.*;
+
 
 /**
  * @author daofeng.xjf
@@ -17,15 +14,15 @@ import org.apache.dubbo.rpc.RpcException;
  */
 @Activate(group = Constants.PROVIDER)
 public class TestServerFilter implements Filter {
+
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
-            Result result = invoker.invoke(invocation);
-            return result;
+            return invoker.invoke(invocation);
         }catch (Exception e){
+            e.printStackTrace();
             throw e;
         }
-
     }
 
     @Override

@@ -1,12 +1,11 @@
 package com.aliware.tianchi;
 
+import com.aliware.tianchi.checker.ServerInfoHolder;
 import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.Activate;
-import org.apache.dubbo.rpc.Filter;
-import org.apache.dubbo.rpc.Invocation;
-import org.apache.dubbo.rpc.Invoker;
-import org.apache.dubbo.rpc.Result;
-import org.apache.dubbo.rpc.RpcException;
+import org.apache.dubbo.rpc.*;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author daofeng.xjf
@@ -20,12 +19,26 @@ public class TestClientFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
-            Result result = invoker.invoke(invocation);
-            return result;
+            if (ServerInfoHolder.invokeStart(invoker.getUrl().getPort())) {
+                Result result = invoker.invoke(invocation);
+                CompletableFuture<Integer> future = RpcContext.getContext().getCompletableFuture();
+                if (future != null) {
+                    future.whenComplete(
+                            (actual, t)->
+                                    ServerInfoHolder.invokeDone(invoker.getUrl().getPort())
+                    );
+                } else {
+                    ServerInfoHolder.invokeDone(invoker.getUrl().getPort());
+                }
+                return result;
+            } else {
+                ServerInfoHolder.invokeDone(invoker.getUrl().getPort());
+            }
+            return null;
         }catch (Exception e){
+            e.printStackTrace();
             throw e;
         }
-
     }
 
     @Override
