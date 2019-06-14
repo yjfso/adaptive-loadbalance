@@ -21,7 +21,7 @@ public class TestRequestLimiter implements RequestLimiter {
      */
     @Override
     public boolean tryAcquire(Request request, int activeTaskCount) {
-        return ServerThreadChecker.Singleton.INSTANCE.acceptable();
+        return ServerThreadChecker.getInstance().acceptable();
     }
 
 }

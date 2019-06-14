@@ -18,7 +18,7 @@ public class CallbackServiceImpl implements CallbackService {
     @Override
     public void addListener(String key, CallbackListener listener) {
         this.listener = listener;
-        ServerThreadChecker serverThreadChecker = ServerThreadChecker.Singleton.INSTANCE;
+        ServerThreadChecker serverThreadChecker = ServerThreadChecker.getInstance();
         serverThreadChecker.initServerInfo(this);
         sendMsg(serverThreadChecker.getServerInfo().toString());
     }
