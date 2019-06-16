@@ -19,41 +19,37 @@ public class WorkThreadInfo {
                 }
             };
 
-    private final static int ACTIVE_NUM_BUFFER = 5;
-
-    static int reckonValidThreadNum(ServerThreadInfo serverThreadInfo) {
+    static int reckonValidThreadNum(ThreadChecker threadChecker) {
         int maxNowValidThread = 0;
-        int active = serverThreadInfo.threadPoolExecutor.getActiveCount();
+        int active = threadChecker.threadPoolExecutor.getActiveCount();
 
         for (int i = 0; i < 5; i++) {
-            int validThread = getNowValidThread(serverThreadInfo);
+            int validThread = getNowValidThread(threadChecker);
             if (validThread > maxNowValidThread) {
                 maxNowValidThread = validThread;
             }
         }
-        if (active - ACTIVE_NUM_BUFFER > maxNowValidThread) {
-            System.out.println(maxNowValidThread + "|---active:" + active + ";maxNowVaildThread:" + maxNowValidThread + ";workableThreadNum"+serverThreadInfo.workableThreadNum);
+        if (active - threadChecker.activeNumBuffer > maxNowValidThread) {
             return maxNowValidThread;
         } else {
-            System.out.println(serverThreadInfo.workableThreadNum + "|---active:" + active + ";maxNowVaildThread:" + maxNowValidThread + ";workableThreadNum"+serverThreadInfo.workableThreadNum);
-            return serverThreadInfo.workableThreadNum;
+            return threadChecker.workableThreadNum;
         }
     }
 
-    private static int getNowValidThread(ServerThreadInfo serverThreadInfo) {
-        return getNowValidThread(serverThreadInfo, false);
+    private static int getNowValidThread(ThreadChecker threadChecker) {
+        return getNowValidThread(threadChecker, false);
     }
 
-    private static int getNowValidThread(ServerThreadInfo serverThreadInfo, boolean retry) {
+    private static int getNowValidThread(ThreadChecker threadChecker, boolean retry) {
         int validNum = 0;
-        for (Thread thread : serverThreadInfo.threads) {
+        for (Thread thread : threadChecker.threads) {
             Thread.State state = thread.getState();
             if (state == Thread.State.TERMINATED) {
-                serverThreadInfo.refreshThread();
+                threadChecker.refreshThread();
                 if (retry) {
                     throw new RuntimeException();
                 }
-                return getNowValidThread(serverThreadInfo, true);
+                return getNowValidThread(threadChecker, true);
             }
             if (VALID_STATES.contains(state)) {
                 validNum ++;

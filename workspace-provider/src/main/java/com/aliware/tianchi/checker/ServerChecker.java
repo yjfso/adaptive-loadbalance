@@ -11,10 +11,22 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author yinjianfeng
- * @date 2019/6/8
+ * @date 2019/6/15
  */
-//todo 仅做单服务检测
-public class ServerThreadChecker {
+public class ServerChecker {
+
+    private static class Singleton {
+
+        private final static ServerChecker INSTANCE = new ServerChecker();
+    }
+
+    public static ServerChecker getInstance() {
+        return ServerChecker.Singleton.INSTANCE;
+    }
+
+    public final ThreadChecker threadChecker = new ThreadChecker();
+
+    public final ResponseTimeChecker responseTimeChecker = new ResponseTimeChecker();
 
     //维护serverInfo周期
     private final static int MAINTAIN_INTO_INTERVAL = 1000;
@@ -24,23 +36,7 @@ public class ServerThreadChecker {
 
     private ServerInfo serverInfo;
 
-    private final ServerThreadInfo serverThreadInfo;
-
     private CallbackServiceImpl callbackServiceImpl;
-
-    private static class Singleton {
-
-        private final static ServerThreadChecker INSTANCE = new ServerThreadChecker();
-
-    }
-
-    public static ServerThreadChecker getInstance() {
-        return Singleton.INSTANCE;
-    }
-
-    private ServerThreadChecker() {
-        serverThreadInfo = new ServerThreadInfo();
-    }
 
     public void initServerInfo(CallbackServiceImpl callbackServiceImpl) {
         this.callbackServiceImpl = callbackServiceImpl;
@@ -53,23 +49,22 @@ public class ServerThreadChecker {
                 e.printStackTrace();
             }
         }, 0, MAINTAIN_INTO_INTERVAL, TimeUnit.MILLISECONDS);
-
     }
 
     private void maintainInfo() {
-        int reckon = WorkThreadInfo.reckonValidThreadNum(serverThreadInfo);
-        if (serverInfo.setValidThreadNum(reckon)) {
+        int reckonValidThreadNum = WorkThreadInfo.reckonValidThreadNum(threadChecker);
+        int avgRt = responseTimeChecker.getAvgRt();
+        if (serverInfo.setServerInfo(reckonValidThreadNum, avgRt)) {
+            System.out.println("reckonValidThreadNum" + reckonValidThreadNum + "|avgRt:" + avgRt);
             callbackServiceImpl.sendMsg(serverInfo.toString());
         }
     }
-
 
     public ServerInfo getServerInfo() {
         return serverInfo;
     }
 
     public boolean acceptable() {
-        return serverThreadInfo.workableThreadNum > serverThreadInfo.threadPoolExecutor.getActiveCount();
+        return threadChecker.workableThreadNum > threadChecker.threadPoolExecutor.getActiveCount();
     }
-
 }

@@ -1,5 +1,6 @@
 package com.aliware.tianchi;
 
+import com.aliware.tianchi.checker.Elector;
 import com.aliware.tianchi.checker.ServerInfoHolder;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 
@@ -16,7 +17,7 @@ public class CallbackListenerImpl implements CallbackListener {
     @Override
     public void receiveServerMsg(String msg) {
         ServerInfoHolder.fromMsg(msg);
-        ServerInfoHolder.electPowerest();
+//        Elector.electPowerest();
     }
 
 }

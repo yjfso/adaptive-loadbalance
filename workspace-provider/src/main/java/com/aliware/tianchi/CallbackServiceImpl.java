@@ -1,6 +1,6 @@
 package com.aliware.tianchi;
 
-import com.aliware.tianchi.checker.ServerThreadChecker;
+import com.aliware.tianchi.checker.ServerChecker;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 import org.apache.dubbo.rpc.service.CallbackService;
 
@@ -18,9 +18,9 @@ public class CallbackServiceImpl implements CallbackService {
     @Override
     public void addListener(String key, CallbackListener listener) {
         this.listener = listener;
-        ServerThreadChecker serverThreadChecker = ServerThreadChecker.getInstance();
-        serverThreadChecker.initServerInfo(this);
-        sendMsg(serverThreadChecker.getServerInfo().toString());
+        ServerChecker serverChecker = ServerChecker.getInstance();
+        serverChecker.initServerInfo(this);
+        sendMsg(serverChecker.getServerInfo().toString());
     }
 
     public void sendMsg(String msg) {

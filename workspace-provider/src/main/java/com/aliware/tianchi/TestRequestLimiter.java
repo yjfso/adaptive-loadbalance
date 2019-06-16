@@ -1,6 +1,6 @@
 package com.aliware.tianchi;
 
-import com.aliware.tianchi.checker.ServerThreadChecker;
+import com.aliware.tianchi.checker.ServerChecker;
 import org.apache.dubbo.remoting.exchange.Request;
 import org.apache.dubbo.remoting.transport.RequestLimiter;
 
@@ -21,7 +21,7 @@ public class TestRequestLimiter implements RequestLimiter {
      */
     @Override
     public boolean tryAcquire(Request request, int activeTaskCount) {
-        return ServerThreadChecker.getInstance().acceptable();
+        return ServerChecker.getInstance().acceptable();
     }
 
 }

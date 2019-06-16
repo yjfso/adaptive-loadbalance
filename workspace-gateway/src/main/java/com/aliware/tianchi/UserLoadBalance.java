@@ -1,5 +1,6 @@
 package com.aliware.tianchi;
 
+import com.aliware.tianchi.checker.Elector;
 import com.aliware.tianchi.checker.ServerInfoHolder;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.rpc.Invocation;
@@ -29,7 +30,7 @@ public class UserLoadBalance implements LoadBalance {
                     invoker -> ServerInfoHolder.get(invoker.getUrl().getPort())
             );
         }
-        ServerInfo serverInfo = ServerInfoHolder.loadPowerest();
+        ServerInfo serverInfo = Elector.loadPowerest();
         if (serverInfo != null) {
             int port = serverInfo.getServerPort();
             for (Invoker<T> invoker : invokers) {

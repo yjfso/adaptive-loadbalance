@@ -12,17 +12,23 @@ public class ServerInfo {
 
     private volatile int validThreadNum = 800; // 初始都给高
 
-    private AtomicInteger totalRequest = new AtomicInteger(0);
+    private volatile int avgResponseTime = 50;
 
-    private AtomicInteger activeThreadNum = new AtomicInteger(0);
+    private final AtomicInteger totalRequest = new AtomicInteger(0);
+
+    public final AtomicInteger activeThreadNum = new AtomicInteger(0);
 
     public ServerInfo(int serverPort) {
         this.serverPort = serverPort;
     }
 
-    public boolean setValidThreadNum(int validThreadNum) {
-        if (validThreadNum == this.validThreadNum) {
+    public boolean setServerInfo(int validThreadNum, int avgRt) {
+        validThreadNum = (int) (validThreadNum * 0.9);
+        if (validThreadNum == this.validThreadNum && (avgRt == 0 || this.avgResponseTime == avgRt)) {
             return false;
+        }
+        if (avgRt != 0) {
+            this.avgResponseTime = avgRt;
         }
         this.validThreadNum = validThreadNum;
         return true;
@@ -45,8 +51,8 @@ public class ServerInfo {
         return validThreadNum;
     }
 
-    public int weight() {
-        return validThreadNum - activeThreadNum.get();
+    public boolean hasSurplusThreadNum() {
+        return validThreadNum > activeThreadNum.get();
     }
 
     public int getServerPort() {
@@ -56,8 +62,13 @@ public class ServerInfo {
     public int getTotalRequest() {
         return totalRequest.get();
     }
+
+    public int getAvgResponseTime() {
+        return avgResponseTime;
+    }
+
     @Override
     public String toString() {
-        return serverPort + "|" + validThreadNum;
+        return serverPort + "|" + validThreadNum + "|" + avgResponseTime;
     }
 }
