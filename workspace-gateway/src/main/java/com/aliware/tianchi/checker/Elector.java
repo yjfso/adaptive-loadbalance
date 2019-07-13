@@ -91,7 +91,7 @@ public class Elector {
                     } finally {
 //                        ELECT_LOCK.unlock();
                     }
-                }, 0, 2, TimeUnit.MILLISECONDS
+                }, 0, 1, TimeUnit.MILLISECONDS
         );
     }
 
