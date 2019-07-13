@@ -71,4 +71,8 @@ public class ServerInfo {
     public String toString() {
         return serverPort + "|" + validThreadNum + "|" + avgResponseTime;
     }
+
+    public void setValidThreadNum(int validThreadNum) {
+        this.validThreadNum = validThreadNum;
+    }
 }
