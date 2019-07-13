@@ -3,6 +3,8 @@ package com.aliware.tianchi.checker;
 import com.aliware.tianchi.CallbackServiceImpl;
 import com.aliware.tianchi.ServerInfo;
 import com.aliware.tianchi.TianchiThreadFactory;
+import org.apache.dubbo.common.logger.Logger;
+import org.apache.dubbo.common.logger.LoggerFactory;
 import org.apache.dubbo.rpc.RpcContext;
 
 import java.util.concurrent.Executors;
@@ -14,6 +16,8 @@ import java.util.concurrent.TimeUnit;
  * @date 2019/6/15
  */
 public class ServerChecker {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerChecker.class);
 
     private static class Singleton {
 
@@ -41,6 +45,7 @@ public class ServerChecker {
     public void initServerInfo(CallbackServiceImpl callbackServiceImpl) {
         this.callbackServiceImpl = callbackServiceImpl;
         serverInfo = new ServerInfo(RpcContext.getContext().getLocalPort());
+        serverInfo.setValidThreadNum(threadChecker.workableThreadNum);
 
         EXECUTOR.scheduleWithFixedDelay(() -> {
             try {
@@ -55,7 +60,7 @@ public class ServerChecker {
         int reckonValidThreadNum = WorkThreadInfo.reckonValidThreadNum(threadChecker);
         int avgRt = responseTimeChecker.getAvgRt();
         if (serverInfo.setServerInfo(reckonValidThreadNum, avgRt)) {
-            System.out.println("reckonValidThreadNum" + reckonValidThreadNum + "|avgRt:" + avgRt);
+            LOGGER.info("reckonValidThreadNum:" + reckonValidThreadNum + "|avgRt:" + avgRt);
             callbackServiceImpl.sendMsg(serverInfo.toString());
         }
     }

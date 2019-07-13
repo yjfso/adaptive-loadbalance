@@ -1,6 +1,7 @@
 package com.aliware.tianchi.checker;
 
 import com.aliware.tianchi.ServerInfo;
+import com.aliware.tianchi.TimeUtil;
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
 
@@ -22,7 +23,7 @@ public class ServerInfoHolder {
     private final static int REJECT_THRESHOLD = -10;
 
     public static void fromMsg(String msg) {
-        LOGGER.info("receive msg" + msg);
+        LOGGER.info(TimeUtil.getNow() + " receive msg" + msg);
         String[] meta = msg.split("\\|");
         Integer port = Integer.valueOf(meta[0]);
         SERVER_INFO_MAP.computeIfAbsent(port, ServerInfo::new);

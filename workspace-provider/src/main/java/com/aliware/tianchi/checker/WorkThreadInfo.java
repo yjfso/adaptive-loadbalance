@@ -31,7 +31,11 @@ public class WorkThreadInfo {
         }
         if (active - threadChecker.activeNumBuffer > maxNowValidThread) {
             return maxNowValidThread;
-        } else {
+        }
+//        else if (maxNowValidThread > lastValidThreadNum) {
+//            return maxNowValidThread;// todo 步进 添加
+//        }
+        else {
             return threadChecker.workableThreadNum;
         }
     }
