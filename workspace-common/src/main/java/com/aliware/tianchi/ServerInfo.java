@@ -22,17 +22,41 @@ public class ServerInfo {
         this.serverPort = serverPort;
     }
 
-    public boolean setServerInfo(int validThreadNum, int avgRt) {
-        validThreadNum = (int) (validThreadNum * 0.9);
-        if (validThreadNum == this.validThreadNum && (avgRt == 0 || this.avgResponseTime == avgRt)) {
+    public boolean setValidThreadNum (int validThreadNum) {
+        if (validThreadNum == 0) {
             return false;
         }
-        if (avgRt != 0) {
-            this.avgResponseTime = avgRt;
+        validThreadNum = (int) (validThreadNum * 0.95);
+        if (validThreadNum == this.validThreadNum) {
+            return false;
         }
         this.validThreadNum = validThreadNum;
         return true;
     }
+
+    private boolean setAvgRt(int avgRt) {
+        if (avgRt == 0 || this.avgResponseTime == avgRt) {
+            return false;
+        }
+        this.avgResponseTime = avgRt;
+        return true;
+    }
+
+    public boolean setServerInfo(int validThreadNum, int avgRt) {
+        return setValidThreadNum(validThreadNum) || setAvgRt(avgRt);
+    }
+
+//    public boolean setServerInfo(int validThreadNum, int avgRt) {
+//        validThreadNum = (int) (validThreadNum * 0.9);
+//        if (validThreadNum == this.validThreadNum && (avgRt == 0 || this.avgResponseTime == avgRt)) {
+//            return false;
+//        }
+//        if (avgRt != 0) {
+//            this.avgResponseTime = avgRt;
+//        }
+//        this.validThreadNum = validThreadNum;
+//        return true;
+//    }
 
     public int incrActiveThreadNum() {
         totalRequest.incrementAndGet();
@@ -72,7 +96,7 @@ public class ServerInfo {
         return serverPort + "|" + validThreadNum + "|" + avgResponseTime;
     }
 
-    public void setValidThreadNum(int validThreadNum) {
-        this.validThreadNum = validThreadNum;
-    }
+//    public void setValidThreadNum(int validThreadNum) {
+//        this.validThreadNum = validThreadNum;
+//    }
 }

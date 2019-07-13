@@ -19,7 +19,11 @@ public class WorkThreadInfo {
                 }
             };
 
-    static int reckonValidThreadNum(ThreadChecker threadChecker) {
+    private static int notFullTime = 0;
+
+    private final static int RESET_VALID_THREAD_NUM_THRESHOLD = 3;
+
+    static int reckonValidThreadNum(ThreadChecker threadChecker, int lastValidThreadNum) {
         int maxNowValidThread = 0;
         int active = threadChecker.threadPoolExecutor.getActiveCount();
 
@@ -30,13 +34,17 @@ public class WorkThreadInfo {
             }
         }
         if (active - threadChecker.activeNumBuffer > maxNowValidThread) {
+            notFullTime = 0;
             return maxNowValidThread;
         }
-//        else if (maxNowValidThread > lastValidThreadNum) {
-//            return maxNowValidThread;// todo 步进 添加
-//        }
-        else {
+        else if (maxNowValidThread > lastValidThreadNum) {
+            return maxNowValidThread;
+        }
+        else if (++notFullTime > RESET_VALID_THREAD_NUM_THRESHOLD) {
+            notFullTime = 0;
             return threadChecker.workableThreadNum;
+        } else {
+            return 0;
         }
     }
 
