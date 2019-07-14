@@ -5,8 +5,10 @@ import com.aliware.tianchi.TimeUtil;
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author yinjianfeng
@@ -16,9 +18,9 @@ public class ServerInfoHolder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerInfoHolder.class);
 
-    final static Map<Integer, ServerInfo> SERVER_INFO_MAP = new ConcurrentHashMap<>();
+    final static Map<Integer, ServerInfo> SERVER_INFO_MAP = new HashMap<>();
 
-    private static volatile int factor = 0;
+    final static List<ServerInfo> SERVER_INFOS = new ArrayList<>();
 
     private final static int REJECT_THRESHOLD = -10;
 
@@ -47,13 +49,20 @@ public class ServerInfoHolder {
     public static ServerInfo get(Integer port) {
         ServerInfo serverInfo = SERVER_INFO_MAP.get(port);
         if (serverInfo == null) {
-            serverInfo = new ServerInfo(port);
-            SERVER_INFO_MAP.put(port, serverInfo);
+            synchronized (ServerInfoHolder.class) {
+                serverInfo = SERVER_INFO_MAP.get(port);
+                if (serverInfo == null) {
+                    serverInfo = new ServerInfo(port);
+                    SERVER_INFO_MAP.put(port, serverInfo);
+                    SERVER_INFOS.add(serverInfo);
+                }
+            }
         }
         return serverInfo;
     }
 
     public static void remove(Integer port) {
+        SERVER_INFOS.remove(SERVER_INFO_MAP.get(port));
         SERVER_INFO_MAP.remove(port);
     }
 

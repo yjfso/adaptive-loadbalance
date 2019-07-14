@@ -46,35 +46,18 @@ public class Elector {
                             return;
                         }
                         //todo 最小值调整
-                        int max = Integer.MIN_VALUE;
-                        int second = Integer.MIN_VALUE;
                         int minAvgResponseTime = Integer.MAX_VALUE;
                         ServerInfo powerest = null;
                         ServerInfo minRt = null;
-                        StringBuilder weightInfo = new StringBuilder();
-                        for (ServerInfo value : ServerInfoHolder.SERVER_INFO_MAP.values()) {
+                        for (ServerInfo value : ServerInfoHolder.SERVER_INFOS) {
                             int rt = value.getAvgResponseTime();
-//                            weightInfo.append(value.getServerPort()).append(":").append(rt)
-//                                    .append(",")
-//                                    .append(value.getValidThreadNum())
-//                                    .append(",")
-//                                    .append(value.activeThreadNum.get())
-//                                    .append(";");
-                            if (powerest ==null || minAvgResponseTime > rt) {
+                            if (powerest == null || minAvgResponseTime > rt) {
                                 minAvgResponseTime = rt;
                                 minRt = value;
                                 if (value.hasSurplusThreadNum()) {
                                     powerest = value;
                                 }
                             }
-//                            value.getAvgResponseTime();
-//                            int weight = ;
-//                            weightInfo.append(value.getServerPort()).append(":").append(weight).append(";");
-//                            if (max < weight) {
-//                                second = max;
-//                                max = weight;
-//                                powerest = value;
-//                            }
                         }
 
                         if (powerest != null) {
