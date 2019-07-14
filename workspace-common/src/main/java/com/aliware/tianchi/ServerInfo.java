@@ -52,7 +52,7 @@ public class ServerInfo {
         if (validThreadNum == 0) {
             return false;
         }
-        validThreadNum = (int) (validThreadNum * 0.9);
+        validThreadNum = (int) (validThreadNum * 0.95);
         if (validThreadNum == this.validThreadNum) {
             return false;
         }
