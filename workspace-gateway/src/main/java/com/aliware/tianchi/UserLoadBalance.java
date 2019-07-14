@@ -27,17 +27,21 @@ public class UserLoadBalance implements LoadBalance {
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         if (!init.tryLock()) {
             invokers.forEach(
-                    invoker -> ServerInfoHolder.get(invoker.getUrl().getPort())
+                    invoker ->{
+                        ServerInfo serverInfo = ServerInfoHolder.get(invoker.getUrl().getPort());
+                        serverInfo.setInvoker(invoker);
+                    }
             );
         }
         ServerInfo serverInfo = Elector.loadPowerest();
+
         if (serverInfo != null) {
-            int port = serverInfo.getServerPort();
-            for (Invoker<T> invoker : invokers) {
-                if (invoker.getUrl().getPort() == port) {
-                    return invoker;
-                }
+            Invoker invoker = serverInfo.getInvoker();
+            if (!invoker.isAvailable()) {
+                ServerInfoHolder.remove(serverInfo.getServerPort());
+                init.unlock();
             }
+            return invoker;
         }
         {
             Invoker invoker = invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));

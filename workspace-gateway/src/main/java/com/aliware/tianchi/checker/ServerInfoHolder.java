@@ -26,8 +26,8 @@ public class ServerInfoHolder {
         LOGGER.info(TimeUtil.getNow() + " receive msg" + msg);
         String[] meta = msg.split("\\|");
         Integer port = Integer.valueOf(meta[0]);
-        SERVER_INFO_MAP.computeIfAbsent(port, ServerInfo::new);
-        ServerInfo serverInfo = SERVER_INFO_MAP.get(port);
+
+        ServerInfo serverInfo = get(port);
         serverInfo.setServerInfo(Integer.valueOf(meta[1]), Integer.valueOf(meta[2]));
     }
 
@@ -51,6 +51,10 @@ public class ServerInfoHolder {
             SERVER_INFO_MAP.put(port, serverInfo);
         }
         return serverInfo;
+    }
+
+    public static void remove(Integer port) {
+        SERVER_INFO_MAP.remove(port);
     }
 
 }

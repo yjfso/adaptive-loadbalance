@@ -1,5 +1,7 @@
 package com.aliware.tianchi;
 
+import org.apache.dubbo.rpc.Invoker;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -17,6 +19,8 @@ public class ServerInfo {
     private final AtomicInteger totalRequest = new AtomicInteger(0);
 
     public final AtomicInteger activeThreadNum = new AtomicInteger(0);
+
+    private Invoker invoker;
 
     public ServerInfo(int serverPort) {
         this.serverPort = serverPort;
@@ -96,7 +100,15 @@ public class ServerInfo {
         return serverPort + "|" + validThreadNum + "|" + avgResponseTime;
     }
 
-//    public void setValidThreadNum(int validThreadNum) {
+    public Invoker getInvoker() {
+        return invoker;
+    }
+
+    public void setInvoker(Invoker invoker) {
+        this.invoker = invoker;
+    }
+
+    //    public void setValidThreadNum(int validThreadNum) {
 //        this.validThreadNum = validThreadNum;
 //    }
 }
