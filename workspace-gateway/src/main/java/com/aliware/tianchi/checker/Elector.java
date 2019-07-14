@@ -49,12 +49,18 @@ public class Elector {
                         int minAvgResponseTime = Integer.MAX_VALUE;
                         ServerInfo powerest = null;
                         ServerInfo minRt = null;
-                        for (ServerInfo value : ServerInfoHolder.SERVER_INFOS) {
+                        int size = ServerInfoHolder.SERVER_INFOS.size();
+                        for (int i = 0; i < size; i++) {
+                            ServerInfo value = ServerInfoHolder.SERVER_INFOS.get(i);
+                            if (value.mandatory()) {
+                                powerest = value;
+                                break;
+                            }
                             int rt = value.getAvgResponseTime();
                             if (powerest == null || minAvgResponseTime > rt) {
                                 minAvgResponseTime = rt;
                                 minRt = value;
-                                if (value.hasSurplusThreadNum()) {
+                                if (value.hasSurplusThreadNum() && value.qualified()) {
                                     powerest = value;
                                 }
                             }
@@ -68,6 +74,15 @@ public class Elector {
                         } else {
                             Elector.powerest = minRt;
                         }
+                        for (int i = 0; i < size; i++) {
+                            ServerInfo value = ServerInfoHolder.SERVER_INFOS.get(i);
+                            if (value == Elector.powerest) {
+                                value.elect();
+                            } else {
+                                value.unElect();
+                            }
+                        }
+
 //                        LOGGER.info("choice:" + Elector.powerest.getServerPort() + "|" +weightInfo.toString());
                     } catch (Exception e) {
                         e.printStackTrace();
