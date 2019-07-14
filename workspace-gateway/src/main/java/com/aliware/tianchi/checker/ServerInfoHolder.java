@@ -18,14 +18,14 @@ public class ServerInfoHolder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerInfoHolder.class);
 
-    final static Map<Integer, ServerInfo> SERVER_INFO_MAP = new HashMap<>();
+    final static Map<Integer, ServerInfo> SERVER_INFO_MAP = new HashMap<>(3);
 
-    final static List<ServerInfo> SERVER_INFOS = new ArrayList<>();
+    final static List<ServerInfo> SERVER_INFOS = new ArrayList<>(3);
 
     private final static int REJECT_THRESHOLD = -10;
 
     public static void fromMsg(String msg) {
-        LOGGER.info(TimeUtil.getNow() + " receive msg" + msg);
+//        LOGGER.info(TimeUtil.getNow() + " receive msg" + msg);
         String[] meta = msg.split("\\|");
         Integer port = Integer.valueOf(meta[0]);
 
@@ -35,11 +35,12 @@ public class ServerInfoHolder {
 
     public static boolean invokeStart(Integer port) {
         ServerInfo serverInfo = get(port);
-        int now = serverInfo.incrActiveThreadNum();
+        serverInfo.incrActiveThreadNum();
 //        if (now > factor || serverInfo.getValidThreadNum() - now < 10) {
 //            electPowerest();
 //        }
-        return now > REJECT_THRESHOLD;
+        return true;
+//        return now > REJECT_THRESHOLD;
     }
 
     public static void invokeDone(Integer port) {

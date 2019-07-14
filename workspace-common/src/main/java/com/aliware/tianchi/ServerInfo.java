@@ -52,7 +52,7 @@ public class ServerInfo {
         if (validThreadNum == 0) {
             return false;
         }
-        validThreadNum = (int) (validThreadNum * 0.95);
+        validThreadNum = (int) (validThreadNum * 0.9);
         if (validThreadNum == this.validThreadNum) {
             return false;
         }
@@ -61,7 +61,11 @@ public class ServerInfo {
     }
 
     private boolean setAvgRt(int avgRt) {
-        if (avgRt == 0 || this.avgResponseTime == avgRt) {
+        if (avgRt == 0) {
+            return false;
+        }
+        int diff = avgRt - this.avgResponseTime;
+        if (diff > 0 && diff < 3) {
             return false;
         }
         this.avgResponseTime = avgRt;
@@ -85,7 +89,7 @@ public class ServerInfo {
 //    }
 
     public int incrActiveThreadNum() {
-        totalRequest.incrementAndGet();
+//        totalRequest.incrementAndGet();
         return activeThreadNum.incrementAndGet();
     }
 

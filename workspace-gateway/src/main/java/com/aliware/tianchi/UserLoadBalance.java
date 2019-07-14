@@ -44,8 +44,7 @@ public class UserLoadBalance implements LoadBalance {
             return invoker;
         }
         {
-            Invoker invoker = invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
-            return invoker;
+            return invokers.get(ThreadLocalRandom.current().nextInt(invokers.size()));
         }
     }
 }

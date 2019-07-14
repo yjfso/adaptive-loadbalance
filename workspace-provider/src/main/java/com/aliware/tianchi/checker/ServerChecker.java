@@ -60,7 +60,7 @@ public class ServerChecker {
         int reckonValidThreadNum = WorkThreadInfo.reckonValidThreadNum(threadChecker, serverInfo.getValidThreadNum());
         int avgRt = responseTimeChecker.getAvgRt();
         if (serverInfo.setServerInfo(reckonValidThreadNum, avgRt)) {
-            LOGGER.info("reckonValidThreadNum:" + reckonValidThreadNum + "|avgRt:" + avgRt);
+//            LOGGER.info("reckonValidThreadNum:" + reckonValidThreadNum + "|avgRt:" + avgRt);
             callbackServiceImpl.sendMsg(serverInfo.toString());
         }
     }

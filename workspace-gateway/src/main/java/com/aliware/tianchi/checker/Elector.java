@@ -21,17 +21,17 @@ public class Elector {
 
     private final static ScheduledExecutorService EXECUTOR = Executors.newSingleThreadScheduledExecutor();
 
-    private final static BoolLock ELECT_LOCK = new BoolLock();
+//    private final static BoolLock ELECT_LOCK = new BoolLock();
 
     static {
-        EXECUTOR
-                .scheduleWithFixedDelay(() -> {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    for (ServerInfo value : ServerInfoHolder.SERVER_INFO_MAP.values()) {
-                        stringBuilder.append(value.getServerPort()).append(":").append(value.getTotalRequest()).append(";");
-                    }
-                    System.out.println(stringBuilder.toString());
-                }, 0, 1, TimeUnit.SECONDS);
+//        EXECUTOR
+//                .scheduleWithFixedDelay(() -> {
+//                    StringBuilder stringBuilder = new StringBuilder();
+//                    for (ServerInfo value : ServerInfoHolder.SERVER_INFO_MAP.values()) {
+//                        stringBuilder.append(value.getServerPort()).append(":").append(value.getTotalRequest()).append(";");
+//                    }
+//                    System.out.println(stringBuilder.toString());
+//                }, 0, 1, TimeUnit.SECONDS);
         electPowerest();
     }
 
@@ -45,7 +45,6 @@ public class Elector {
                         if (ServerInfoHolder.SERVER_INFO_MAP.isEmpty()) {
                             return;
                         }
-                        //todo 最小值调整
                         int minAvgResponseTime = Integer.MAX_VALUE;
                         ServerInfo powerest = null;
                         ServerInfo minRt = null;

@@ -23,7 +23,7 @@ public class ResponseTimeChecker {
             if (num == 0) {
                 return 0;
             }
-            return TOTAL_TIME.get() / NUM.get();
+            return TOTAL_TIME.get() / num;
         } finally {
             clear();
         }
