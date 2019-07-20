@@ -16,6 +16,8 @@ public class ServerInfo {
 
     private volatile int avgResponseTime = 50;
 
+    public volatile boolean full = false;
+
     private final AtomicInteger totalRequest = new AtomicInteger(0);
 
     public final AtomicInteger activeThreadNum = new AtomicInteger(0);
@@ -52,7 +54,7 @@ public class ServerInfo {
         if (validThreadNum == 0) {
             return false;
         }
-        validThreadNum = (int) (validThreadNum * 0.95);
+//        validThreadNum = (int) (validThreadNum * 0.99);
         if (validThreadNum == this.validThreadNum) {
             return false;
         }
@@ -65,7 +67,7 @@ public class ServerInfo {
             return false;
         }
         int diff = avgRt - this.avgResponseTime;
-        if (diff > 0 && diff < 3) {
+        if (diff >= 0 && diff < 3) {
             return false;
         }
         this.avgResponseTime = avgRt;
@@ -106,7 +108,7 @@ public class ServerInfo {
     }
 
     public boolean hasSurplusThreadNum() {
-        return validThreadNum > activeThreadNum.get();
+        return validThreadNum > activeThreadNum.get();// > 15;
     }
 
     public int getServerPort() {

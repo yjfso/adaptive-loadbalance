@@ -42,7 +42,7 @@ public class WorkThreadInfo {
         }
         else if (++notFullTime > RESET_VALID_THREAD_NUM_THRESHOLD) {
             notFullTime = 0;
-            return threadChecker.workableThreadNum;
+            return Math.min(threadChecker.workableThreadNum, lastValidThreadNum + 10);
         } else {
             return 0;
         }

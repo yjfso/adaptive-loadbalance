@@ -25,17 +25,22 @@ public class ServerInfoHolder {
     private final static int REJECT_THRESHOLD = -10;
 
     public static void fromMsg(String msg) {
-//        LOGGER.info(TimeUtil.getNow() + " receive msg" + msg);
+        LOGGER.info(TimeUtil.getNow() + " receive msg" + msg);
         String[] meta = msg.split("\\|");
         Integer port = Integer.valueOf(meta[0]);
 
         ServerInfo serverInfo = get(port);
         serverInfo.setServerInfo(Integer.valueOf(meta[1]), Integer.valueOf(meta[2]));
+        Elector.electPowerest1();
     }
 
     public static boolean invokeStart(Integer port) {
         ServerInfo serverInfo = get(port);
         serverInfo.incrActiveThreadNum();
+        if (!serverInfo.hasSurplusThreadNum()) {
+            serverInfo.full = true;
+            Elector.electPowerest1();
+        }
 //        if (now > factor || serverInfo.getValidThreadNum() - now < 10) {
 //            electPowerest();
 //        }
@@ -44,7 +49,12 @@ public class ServerInfoHolder {
     }
 
     public static void invokeDone(Integer port) {
-        SERVER_INFO_MAP.get(port).descActiveThreadNum();
+        ServerInfo serverInfo = SERVER_INFO_MAP.get(port);
+        int result = serverInfo.descActiveThreadNum();
+        if (serverInfo.full && serverInfo.getValidThreadNum() > result) {
+            serverInfo.full = false;
+            Elector.electPowerest1();
+        }
     }
 
     public static ServerInfo get(Integer port) {

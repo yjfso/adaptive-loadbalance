@@ -21,7 +21,7 @@ public class Elector {
 
     private final static ScheduledExecutorService EXECUTOR = Executors.newSingleThreadScheduledExecutor();
 
-//    private final static BoolLock ELECT_LOCK = new BoolLock();
+    private final static BoolLock ELECT_LOCK = new BoolLock();
 
     static {
 //        EXECUTOR
@@ -32,7 +32,7 @@ public class Elector {
 //                    }
 //                    System.out.println(stringBuilder.toString());
 //                }, 0, 1, TimeUnit.SECONDS);
-        electPowerest();
+//        electPowerest();
     }
 
     public static void electPowerest() {
@@ -92,8 +92,41 @@ public class Elector {
         );
     }
 
+    public static void electPowerest1() {
+        if (!ELECT_LOCK.tryLock()) {
+            return;
+        }
+        int minAvgResponseTime = Integer.MAX_VALUE;
+        ServerInfo powerest = null;
+        ServerInfo minRt = null;
+        int size = ServerInfoHolder.SERVER_INFOS.size();
+        for (int i = 0; i < size; i++) {
+            ServerInfo value = ServerInfoHolder.SERVER_INFOS.get(i);
+            int rt = value.getAvgResponseTime();
+            if (minAvgResponseTime > rt) {
+                minAvgResponseTime = rt;
+                minRt = value;
+            }
+            if (powerest == null || minAvgResponseTime > rt) {
+
+
+                if (value.hasSurplusThreadNum()) {
+                    powerest = value;
+                }
+            }
+        }
+
+        if (powerest != null) {
+            Elector.powerest = powerest;
+        } else {
+            Elector.powerest = minRt;
+        }
+        ELECT_LOCK.unlock();
+    }
+
     public static ServerInfo loadPowerest() {
         if (powerest == null) {
+            electPowerest1();
             if (ServerInfoHolder.SERVER_INFO_MAP.isEmpty()) {
                 return null;
             }
