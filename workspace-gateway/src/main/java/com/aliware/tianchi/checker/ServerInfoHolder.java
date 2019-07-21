@@ -36,11 +36,11 @@ public class ServerInfoHolder {
 
     public static boolean invokeStart(Integer port) {
         ServerInfo serverInfo = get(port);
-        int result = serverInfo.incrActiveThreadNum();
-        if (result > serverInfo.getValidThreadNum()) {
-            serverInfo.full = true;
-            Elector.electPowerest1();
-        }
+        serverInfo.incrActiveThreadNum();
+//        if (result > serverInfo.getValidThreadNum() - 5) {
+//            serverInfo.full = true;
+//            Elector.electPowerest1();
+//        }
 //        if (now > factor || serverInfo.getValidThreadNum() - now < 10) {
 //            electPowerest();
 //        }

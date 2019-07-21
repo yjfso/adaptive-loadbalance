@@ -22,8 +22,6 @@ public class Elector {
 
 //    private final static ScheduledExecutorService EXECUTOR = Executors.newSingleThreadScheduledExecutor();
 
-    private final static ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
-
     private final static BoolLock ELECT_LOCK = new BoolLock();
 
     static {
@@ -99,36 +97,32 @@ public class Elector {
         if (!ELECT_LOCK.tryLock()) {
             return;
         }
-        EXECUTOR.submit(
-                () -> {
-                    try {
-                        int minAvgResponseTime = Integer.MAX_VALUE;
-                        ServerInfo powerest = null;
-                        ServerInfo minRt = null;
-                        int size = ServerInfoHolder.SERVER_INFOS.size();
-                        for (int i = 0; i < size; i++) {
-                            ServerInfo value = ServerInfoHolder.SERVER_INFOS.get(i);
-                            int rt = value.getAvgResponseTime();
-                            if (powerest == null || minAvgResponseTime > rt) {
-                                minAvgResponseTime = rt;
-                                minRt = value;
-                                if (value.hasSurplusThreadNum()) {
-                                    powerest = value;
-                                }
-                            }
-                        }
-
-                        if (powerest != null) {
-                            Elector.powerest = powerest;
-                        } else {
-                            Elector.powerest = minRt;
-                        }
-
-                    } finally {
-                        ELECT_LOCK.unlock();
+        try {
+            int minAvgResponseTime = Integer.MAX_VALUE;
+            ServerInfo powerest = null;
+            ServerInfo minRt = null;
+            int size = ServerInfoHolder.SERVER_INFOS.size();
+            for (int i = 0; i < size; i++) {
+                ServerInfo value = ServerInfoHolder.SERVER_INFOS.get(i);
+                int rt = value.getAvgResponseTime();
+                if (powerest == null || minAvgResponseTime > rt) {
+                    minAvgResponseTime = rt;
+                    minRt = value;
+                    if (value.hasSurplusThreadNum()) {
+                        powerest = value;
                     }
                 }
-        );
+            }
+
+            if (powerest != null) {
+                Elector.powerest = powerest;
+            } else {
+                Elector.powerest = minRt;
+            }
+
+        } finally {
+            ELECT_LOCK.unlock();
+        }
     }
 
     public static ServerInfo loadPowerest() {
@@ -138,6 +132,10 @@ public class Elector {
                 return null;
             }
             powerest = ServerInfoHolder.SERVER_INFO_MAP.values().iterator().next();
+        }
+        if (!powerest.hasSurplusThreadNum()) {
+            powerest.full = true;
+            Elector.electPowerest1();
         }
         return powerest;
     }
