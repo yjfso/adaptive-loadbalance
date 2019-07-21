@@ -12,9 +12,7 @@ public class BoolLock {
 
     public boolean tryLock() {
         if (lock.get()) {
-            if (lock.compareAndSet(true, false)) {
-                return true;
-            }
+            return lock.compareAndSet(true, false);
         }
         return false;
     }

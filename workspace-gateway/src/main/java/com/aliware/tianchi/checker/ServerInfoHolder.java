@@ -36,8 +36,8 @@ public class ServerInfoHolder {
 
     public static boolean invokeStart(Integer port) {
         ServerInfo serverInfo = get(port);
-        serverInfo.incrActiveThreadNum();
-        if (!serverInfo.hasSurplusThreadNum()) {
+        int result = serverInfo.incrActiveThreadNum();
+        if (result > serverInfo.getValidThreadNum()) {
             serverInfo.full = true;
             Elector.electPowerest1();
         }
