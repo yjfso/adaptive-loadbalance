@@ -25,7 +25,7 @@ public class ServerInfoHolder {
     private final static int REJECT_THRESHOLD = -10;
 
     public static void fromMsg(String msg) {
-        LOGGER.info(TimeUtil.getNow() + " receive msg" + msg);
+//        LOGGER.info(TimeUtil.getNow() + " receive msg" + msg);
         String[] meta = msg.split("\\|");
         Integer port = Integer.valueOf(meta[0]);
 
@@ -35,8 +35,7 @@ public class ServerInfoHolder {
     }
 
     public static boolean invokeStart(Integer port) {
-        ServerInfo serverInfo = get(port);
-        serverInfo.incrActiveThreadNum();
+        get(port).incrActiveThreadNum();
 //        if (result > serverInfo.getValidThreadNum() - 5) {
 //            serverInfo.full = true;
 //            Elector.electPowerest1();

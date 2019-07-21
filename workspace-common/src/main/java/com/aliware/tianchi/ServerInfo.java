@@ -24,30 +24,8 @@ public class ServerInfo {
 
     private Invoker invoker;
 
-    private int elect;
-
-    private int unElect;
-
     public ServerInfo(int serverPort) {
         this.serverPort = serverPort;
-    }
-
-    public boolean mandatory() {
-        return unElect > 6;
-    }
-
-    public boolean qualified() {
-        return elect < 4;
-    }
-
-    public void elect() {
-        unElect = 0;
-        elect ++;
-    }
-
-    public void unElect() {
-        elect = 0;
-        unElect ++;
     }
 
     public boolean setValidThreadNum (int validThreadNum) {

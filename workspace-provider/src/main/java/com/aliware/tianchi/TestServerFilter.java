@@ -1,5 +1,6 @@
 package com.aliware.tianchi;
 
+import com.aliware.tianchi.checker.ResponseTimeChecker;
 import com.aliware.tianchi.checker.ServerChecker;
 import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.Activate;
@@ -19,12 +20,16 @@ public class TestServerFilter implements Filter {
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
         try{
-            long start = System.currentTimeMillis();
-            Result result = invoker.invoke(invocation);
-//            if ("hash".equals(invocation.getMethodName())) {
+            Result result;
+            ResponseTimeChecker responseTimeChecker = ServerChecker.getInstance().responseTimeChecker;
+            if (responseTimeChecker.receive) {
+                long start = System.currentTimeMillis();
+                result = invoker.invoke(invocation);
                 long end = System.currentTimeMillis();
-                ServerChecker.getInstance().responseTimeChecker.addSpecimen(end - start);
-//            }
+                responseTimeChecker.addSpecimen(end - start);
+            } else {
+                result = invoker.invoke(invocation);
+            }
             return result;
         }catch (Exception e){
             e.printStackTrace();

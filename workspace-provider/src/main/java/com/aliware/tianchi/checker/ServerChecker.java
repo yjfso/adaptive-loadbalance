@@ -54,6 +54,15 @@ public class ServerChecker {
                 e.printStackTrace();
             }
         }, 0, MAINTAIN_INTO_INTERVAL, TimeUnit.MILLISECONDS);
+
+        EXECUTOR.scheduleWithFixedDelay(() -> {
+            try {
+                responseTimeChecker.receive = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, 3 * MAINTAIN_INTO_INTERVAL / 4 , MAINTAIN_INTO_INTERVAL, TimeUnit.MILLISECONDS);
+
     }
 
     private void maintainInfo() {

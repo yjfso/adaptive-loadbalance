@@ -8,9 +8,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ResponseTimeChecker {
 
-    private final static AtomicInteger TOTAL_TIME = new AtomicInteger();
+    public volatile boolean receive = true;
 
-    private final static AtomicInteger NUM = new AtomicInteger();
+    private final AtomicInteger TOTAL_TIME = new AtomicInteger();
+
+    private final AtomicInteger NUM = new AtomicInteger();
 
     public void addSpecimen(long time) {
         TOTAL_TIME.addAndGet((int)time);
@@ -18,6 +20,7 @@ public class ResponseTimeChecker {
     }
 
     int getAvgRt() {
+        receive = false;
         try{
             int num = NUM.get();
             if (num == 0) {
