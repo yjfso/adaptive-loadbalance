@@ -1,6 +1,5 @@
 package com.aliware.tianchi;
 
-import com.aliware.tianchi.checker.ResponseTimeChecker;
 import com.aliware.tianchi.checker.ServerChecker;
 import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.Activate;
@@ -22,10 +21,10 @@ public class TestServerFilter implements Filter {
         try{
             long start = System.currentTimeMillis();
             Result result = invoker.invoke(invocation);
-            if ("hash".equals(invocation.getMethodName())) {
+//            if ("hash".equals(invocation.getMethodName())) {
                 long end = System.currentTimeMillis();
                 ServerChecker.getInstance().responseTimeChecker.addSpecimen(end - start);
-            }
+//            }
             return result;
         }catch (Exception e){
             e.printStackTrace();

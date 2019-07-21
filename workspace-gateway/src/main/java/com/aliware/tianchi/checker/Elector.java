@@ -5,6 +5,7 @@ import com.aliware.tianchi.ServerInfo;
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -19,7 +20,9 @@ public class Elector {
 
     private static volatile ServerInfo powerest;
 
-    private final static ScheduledExecutorService EXECUTOR = Executors.newSingleThreadScheduledExecutor();
+//    private final static ScheduledExecutorService EXECUTOR = Executors.newSingleThreadScheduledExecutor();
+
+    private final static ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
     private final static BoolLock ELECT_LOCK = new BoolLock();
 
@@ -39,86 +42,93 @@ public class Elector {
 //        if (!ELECT_LOCK.tryLock()) {
 //            return;
 //        }
-        EXECUTOR.scheduleWithFixedDelay(
-                () -> {
-                    try {
-                        if (ServerInfoHolder.SERVER_INFO_MAP.isEmpty()) {
-                            return;
-                        }
-                        int minAvgResponseTime = Integer.MAX_VALUE;
-                        ServerInfo powerest = null;
-                        ServerInfo minRt = null;
-                        int size = ServerInfoHolder.SERVER_INFOS.size();
-                        for (int i = 0; i < size; i++) {
-                            ServerInfo value = ServerInfoHolder.SERVER_INFOS.get(i);
-                            if (value.mandatory()) {
-                                powerest = value;
-                                break;
-                            }
-                            int rt = value.getAvgResponseTime();
-                            if (powerest == null || minAvgResponseTime > rt) {
-                                minAvgResponseTime = rt;
-                                minRt = value;
-                                if (value.hasSurplusThreadNum() && value.qualified()) {
-                                    powerest = value;
-                                }
-                            }
-                        }
-
-                        if (powerest != null) {
-//                            LOGGER.info("elect powerest, the winner[" + powerest.getServerPort() + "]; weights:" + weightInfo.toString());
-                            //触发选举因子 可适当减小
-//                            factor = powerest.getActiveThreadNum() + second;
-                            Elector.powerest = powerest;
-                        } else {
-                            Elector.powerest = minRt;
-                        }
-                        for (int i = 0; i < size; i++) {
-                            ServerInfo value = ServerInfoHolder.SERVER_INFOS.get(i);
-                            if (value == Elector.powerest) {
-                                value.elect();
-                            } else {
-                                value.unElect();
-                            }
-                        }
-
-//                        LOGGER.info("choice:" + Elector.powerest.getServerPort() + "|" +weightInfo.toString());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-//                        ELECT_LOCK.unlock();
-                    }
-                }, 0, 1, TimeUnit.MILLISECONDS
-        );
+//        EXECUTOR.scheduleWithFixedDelay(
+//                () -> {
+//                    try {
+//                        if (ServerInfoHolder.SERVER_INFO_MAP.isEmpty()) {
+//                            return;
+//                        }
+//                        int minAvgResponseTime = Integer.MAX_VALUE;
+//                        ServerInfo powerest = null;
+//                        ServerInfo minRt = null;
+//                        int size = ServerInfoHolder.SERVER_INFOS.size();
+//                        for (int i = 0; i < size; i++) {
+//                            ServerInfo value = ServerInfoHolder.SERVER_INFOS.get(i);
+//                            if (value.mandatory()) {
+//                                powerest = value;
+//                                break;
+//                            }
+//                            int rt = value.getAvgResponseTime();
+//                            if (powerest == null || minAvgResponseTime > rt) {
+//                                minAvgResponseTime = rt;
+//                                minRt = value;
+//                                if (value.hasSurplusThreadNum() && value.qualified()) {
+//                                    powerest = value;
+//                                }
+//                            }
+//                        }
+//
+//                        if (powerest != null) {
+////                            LOGGER.info("elect powerest, the winner[" + powerest.getServerPort() + "]; weights:" + weightInfo.toString());
+//                            //触发选举因子 可适当减小
+////                            factor = powerest.getActiveThreadNum() + second;
+//                            Elector.powerest = powerest;
+//                        } else {
+//                            Elector.powerest = minRt;
+//                        }
+//                        for (int i = 0; i < size; i++) {
+//                            ServerInfo value = ServerInfoHolder.SERVER_INFOS.get(i);
+//                            if (value == Elector.powerest) {
+//                                value.elect();
+//                            } else {
+//                                value.unElect();
+//                            }
+//                        }
+//
+////                        LOGGER.info("choice:" + Elector.powerest.getServerPort() + "|" +weightInfo.toString());
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    } finally {
+////                        ELECT_LOCK.unlock();
+//                    }
+//                }, 0, 1, TimeUnit.MILLISECONDS
+//        );
     }
 
     public static void electPowerest1() {
         if (!ELECT_LOCK.tryLock()) {
             return;
         }
-        int minAvgResponseTime = Integer.MAX_VALUE;
-        ServerInfo powerest = null;
-        ServerInfo minRt = null;
-        int size = ServerInfoHolder.SERVER_INFOS.size();
-        for (int i = 0; i < size; i++) {
-            ServerInfo value = ServerInfoHolder.SERVER_INFOS.get(i);
-            int rt = value.getAvgResponseTime();
+        EXECUTOR.submit(
+                () -> {
+                    try {
+                        int minAvgResponseTime = Integer.MAX_VALUE;
+                        ServerInfo powerest = null;
+                        ServerInfo minRt = null;
+                        int size = ServerInfoHolder.SERVER_INFOS.size();
+                        for (int i = 0; i < size; i++) {
+                            ServerInfo value = ServerInfoHolder.SERVER_INFOS.get(i);
+                            int rt = value.getAvgResponseTime();
+                            if (powerest == null || minAvgResponseTime > rt) {
+                                minAvgResponseTime = rt;
+                                minRt = value;
+                                if (value.hasSurplusThreadNum()) {
+                                    powerest = value;
+                                }
+                            }
+                        }
 
-            if (powerest == null || minAvgResponseTime > rt) {
-                minAvgResponseTime = rt;
-                minRt = value;
-                if (value.hasSurplusThreadNum()) {
-                    powerest = value;
+                        if (powerest != null) {
+                            Elector.powerest = powerest;
+                        } else {
+                            Elector.powerest = minRt;
+                        }
+
+                    } finally {
+                        ELECT_LOCK.unlock();
+                    }
                 }
-            }
-        }
-
-        if (powerest != null) {
-            Elector.powerest = powerest;
-        } else {
-            Elector.powerest = minRt;
-        }
-        ELECT_LOCK.unlock();
+        );
     }
 
     public static ServerInfo loadPowerest() {

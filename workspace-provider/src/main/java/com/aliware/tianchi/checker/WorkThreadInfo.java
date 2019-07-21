@@ -21,7 +21,7 @@ public class WorkThreadInfo {
 
     private static int notFullTime = 0;
 
-    private final static int RESET_VALID_THREAD_NUM_THRESHOLD = 3;
+    private final static int RESET_VALID_THREAD_NUM_THRESHOLD = 2;
 
     static int reckonValidThreadNum(ThreadChecker threadChecker, int lastValidThreadNum) {
         int maxNowValidThread = 0;
