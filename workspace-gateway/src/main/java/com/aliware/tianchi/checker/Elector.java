@@ -103,13 +103,10 @@ public class Elector {
         for (int i = 0; i < size; i++) {
             ServerInfo value = ServerInfoHolder.SERVER_INFOS.get(i);
             int rt = value.getAvgResponseTime();
-            if (minAvgResponseTime > rt) {
+
+            if (powerest == null || minAvgResponseTime > rt) {
                 minAvgResponseTime = rt;
                 minRt = value;
-            }
-            if (powerest == null || minAvgResponseTime > rt) {
-
-
                 if (value.hasSurplusThreadNum()) {
                     powerest = value;
                 }
