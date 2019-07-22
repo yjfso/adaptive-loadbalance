@@ -86,7 +86,7 @@ public class ServerInfo {
     }
 
     public boolean hasSurplusThreadNum() {
-        return validThreadNum - activeThreadNum.get() > 15;
+        return validThreadNum - activeThreadNum.get() > 5;
     }
 
     public int getServerPort() {

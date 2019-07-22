@@ -33,7 +33,7 @@ public class ServerChecker {
     public final ResponseTimeChecker responseTimeChecker = new ResponseTimeChecker();
 
     //维护serverInfo周期
-    private final static int MAINTAIN_INTO_INTERVAL = 600;
+    private final static int MAINTAIN_INTO_INTERVAL = 1600;
 
     private final static ScheduledExecutorService EXECUTOR =
             Executors.newSingleThreadScheduledExecutor(new TianchiThreadFactory());
