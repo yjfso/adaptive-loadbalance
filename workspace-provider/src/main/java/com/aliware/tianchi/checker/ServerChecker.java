@@ -33,7 +33,7 @@ public class ServerChecker {
     public final ResponseTimeChecker responseTimeChecker = new ResponseTimeChecker();
 
     //维护serverInfo周期
-    private final static int MAINTAIN_INTO_INTERVAL = 1600;
+    private final static int MAINTAIN_INTO_INTERVAL = 100;
 
     private final static ScheduledExecutorService EXECUTOR =
             Executors.newSingleThreadScheduledExecutor(new TianchiThreadFactory());
@@ -61,7 +61,7 @@ public class ServerChecker {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, 3 * MAINTAIN_INTO_INTERVAL / 4 , MAINTAIN_INTO_INTERVAL, TimeUnit.MILLISECONDS);
+        }, 2 * MAINTAIN_INTO_INTERVAL / 4 , MAINTAIN_INTO_INTERVAL, TimeUnit.MILLISECONDS);
 
     }
 

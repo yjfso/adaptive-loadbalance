@@ -45,7 +45,7 @@ public class ServerInfo {
             return false;
         }
         int diff = avgRt - this.avgResponseTime;
-        if (diff >= 0 && diff < 3) {
+        if (diff >= 0 && diff < 4) {
             return false;
         }
         this.avgResponseTime = avgRt;
