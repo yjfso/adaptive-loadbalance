@@ -33,7 +33,7 @@ public class ServerChecker {
     public final ResponseTimeChecker responseTimeChecker = new ResponseTimeChecker();
 
     //维护serverInfo周期
-    private final static int MAINTAIN_INTO_INTERVAL = 2000;
+    private final static int MAINTAIN_INTO_INTERVAL = 20;
 
     private final static ScheduledExecutorService EXECUTOR =
             Executors.newSingleThreadScheduledExecutor(new TianchiThreadFactory());
@@ -55,13 +55,13 @@ public class ServerChecker {
             }
         }, 0, MAINTAIN_INTO_INTERVAL, TimeUnit.MILLISECONDS);
 
-        EXECUTOR.scheduleWithFixedDelay(() -> {
-            try {
-                responseTimeChecker.receive = true;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, 5 * MAINTAIN_INTO_INTERVAL / 6 , MAINTAIN_INTO_INTERVAL, TimeUnit.MILLISECONDS);
+//        EXECUTOR.scheduleWithFixedDelay(() -> {
+//            try {
+//                responseTimeChecker.receive = true;
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }, 5 * MAINTAIN_INTO_INTERVAL / 6 , MAINTAIN_INTO_INTERVAL, TimeUnit.MILLISECONDS);
 
     }
 

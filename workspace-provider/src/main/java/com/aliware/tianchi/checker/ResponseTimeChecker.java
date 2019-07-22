@@ -20,7 +20,7 @@ public class ResponseTimeChecker {
     }
 
     int getAvgRt() {
-        receive = false;
+//        receive = false;
         try{
             int num = NUM.get();
             if (num == 0) {

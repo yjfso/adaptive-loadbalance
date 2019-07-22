@@ -22,14 +22,14 @@ public class TestServerFilter implements Filter {
         try{
             Result result;
             ResponseTimeChecker responseTimeChecker = ServerChecker.getInstance().responseTimeChecker;
-            if (responseTimeChecker.receive) {
+//            if (responseTimeChecker.receive) {
                 long start = System.currentTimeMillis();
                 result = invoker.invoke(invocation);
                 long end = System.currentTimeMillis();
                 responseTimeChecker.addSpecimen(end - start);
-            } else {
-                result = invoker.invoke(invocation);
-            }
+//            } else {
+//                result = invoker.invoke(invocation);
+//            }
             return result;
         }catch (Exception e){
             e.printStackTrace();
